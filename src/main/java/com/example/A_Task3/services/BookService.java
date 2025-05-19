@@ -1,6 +1,7 @@
 package com.example.A_Task3.services;
 
 import com.example.A_Task3.dtos.CreateBookRequest;
+import com.example.A_Task3.dtos.UpdateBookRequest;
 import com.example.A_Task3.models.Author;
 import com.example.A_Task3.models.Book;
 import com.example.A_Task3.repositories.IAuthorRepository;
@@ -9,11 +10,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.math.BigDecimal;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,14 +45,61 @@ public class BookService {
                 .collect(Collectors.toList());
 
         Book book = modelMapper.map(request, Book.class);
-
         book.setAuthors(new HashSet<>(authors));
-
-
         book.setIsbn(generateValidIsbn13());
         book.setAvailability(true);
 
         return bookRepository.save(book);
     }
 
+    public Book getBookById(UUID id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+    }
+
+    public List<Book> searchBooks(String title, String category, String authorName) {
+        List<Book> books = bookRepository.findAll();
+        if (title != null) {
+            books = books.stream()
+                    .filter(book -> book.getTitle() != null && book.getTitle().toLowerCase().contains(title.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        if (category != null) {
+            books = books.stream()
+                    .filter(book -> book.getCategory() != null && book.getCategory().name().equalsIgnoreCase(category))
+                    .collect(Collectors.toList());
+        }
+        if (authorName != null) {
+            books = books.stream()
+                    .filter(book -> book.getAuthors().stream()
+                            .anyMatch(author -> author.getName().equalsIgnoreCase(authorName)))
+                    .collect(Collectors.toList());
+        }
+        return books;
+    }
+
+    public Book updateBook(UUID id, UpdateBookRequest request) {
+        Book book = getBookById(id);
+        if (request.getTitle() != null) {
+            book.setTitle(request.getTitle());
+        }
+        if (request.getCategory() != null) {
+            book.setCategory(request.getCategory());
+        }
+        if (request.getAuthorNames() != null && !request.getAuthorNames().isEmpty()) {
+            List<Author> authors = request.getAuthorNames().stream()
+                    .map(name -> authorRepository.findByName(name)
+                            .orElseThrow(() -> new RuntimeException("Author not found: " + name)))
+                    .collect(Collectors.toList());
+            book.setAuthors(new HashSet<>(authors));
+        }
+        if (request.getAvailability() != null) {
+            book.setAvailability(request.getAvailability());
+        }
+        return bookRepository.save(book);
+    }
+
+    public void deleteBook(UUID id) {
+        bookRepository.deleteById(id);
+    }
 }
