@@ -18,7 +18,7 @@ import java.util.UUID;
 @ToString(exclude = "authors")
 public class Book {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @Column(unique = true)
     private String isbn;

@@ -15,7 +15,7 @@ import java.util.UUID;
 @Table(name = "borrowing_transaction")
 public class BorrowingTransaction {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne

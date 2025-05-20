@@ -13,7 +13,7 @@ import java.util.UUID;
 @Table(name = "borrower")
 public class Borrower {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String name;
     private String email;
