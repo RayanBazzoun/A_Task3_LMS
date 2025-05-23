@@ -7,6 +7,7 @@ import com.example.A_Task3.repositories.IBookRepository;
 import com.example.A_Task3.repositories.IBorrowerRepository;
 import com.example.A_Task3.repositories.IBorrowingTransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,8 +24,18 @@ public class BorrowingTransactionService {
     @Autowired
     private IBorrowerRepository borrowerRepository;
 
+    @Value("${borrower.transaction.limit}")
+    private int transactionLimit;
+
     public BorrowingTransaction borrowBook(BorrowingTransactionRequest request) {
         log.debug("Borrowing book: {}", request);
+
+        // Count only active borrowings (status = BORROWED)
+        int count = transactionRepository.countByBorrowerIdAndStatus(request.getBorrowerId(), BorrowStatus.BORROWED);
+        if (count >= transactionLimit) {
+            log.warn("Borrower {} has reached the maximum allowed transactions ({}).", request.getBorrowerId(), transactionLimit);
+            throw new RuntimeException("Borrower has reached the maximum allowed transactions.");
+        }
         try {
             Book book = bookRepository.findById(request.getBookId())
                     .orElseThrow(() -> {
@@ -59,6 +70,7 @@ public class BorrowingTransactionService {
             throw new RuntimeException("Failed to borrow book", ex);
         }
     }
+
 
     public BorrowingTransaction returnBook(UUID transactionId) {
         log.debug("Returning book for transactionId={}", transactionId);

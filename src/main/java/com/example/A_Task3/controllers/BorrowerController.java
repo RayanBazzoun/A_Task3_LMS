@@ -4,6 +4,7 @@ import com.example.A_Task3.dtos.BorrowerRequest;
 import com.example.A_Task3.dtos.BorrowerResponse;
 import com.example.A_Task3.models.Borrower;
 import com.example.A_Task3.services.BorrowerService;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class BorrowerController {
     private ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<BorrowerResponse> addBorrower(@RequestBody BorrowerRequest request) {
+    public ResponseEntity<BorrowerResponse> addBorrower(@Valid @RequestBody BorrowerRequest request) {
         log.info("Request to add borrower: {}", request);
         try {
             Borrower borrower = borrowerService.addBorrower(request);
