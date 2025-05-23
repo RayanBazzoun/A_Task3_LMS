@@ -20,20 +20,18 @@ public class OpenLibraryClient {
         );
         String json = restTemplate.getForObject(url, String.class);
 
-        // Parse the JSON response
         JsonNode root = objectMapper.readTree(json);
         JsonNode bookNode = root.get("ISBN:" + isbn);
         if (bookNode == null || bookNode.isNull()) {
             throw new Exception("Book not found in Open Library for ISBN: " + isbn);
         }
 
-        // Extract title
         String title = bookNode.has("title") ? bookNode.get("title").asText() : null;
         if (title == null || title.isEmpty()) {
             throw new Exception("Title not found for ISBN: " + isbn);
         }
 
-        // Extract authors
+
         List<String> authors = new ArrayList<>();
         if (bookNode.has("authors") && bookNode.get("authors").isArray()) {
             for (JsonNode authorNode : bookNode.get("authors")) {
