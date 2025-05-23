@@ -9,11 +9,13 @@ import com.example.A_Task3.repositories.IBookRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class BookService {
     @Autowired
@@ -39,25 +41,41 @@ public class BookService {
     }
 
     public Book addBook(CreateBookRequest request) {
-        List<Author> authors = request.getAuthorNames().stream()
-                .map(name -> authorRepository.findByName(name)
-                        .orElseThrow(() -> new RuntimeException("Author not found: " + name)))
-                .collect(Collectors.toList());
+        log.debug("Adding book with request: {}", request);
+        try {
+            List<Author> authors = request.getAuthorNames().stream()
+                    .map(name -> authorRepository.findByName(name)
+                            .orElseThrow(() -> new RuntimeException("Author not found: " + name)))
+                    .collect(Collectors.toList());
 
-        Book book = modelMapper.map(request, Book.class);
-        book.setAuthors(new HashSet<>(authors));
-        book.setIsbn(generateValidIsbn13());
-        book.setAvailability(true);
+            Book book = modelMapper.map(request, Book.class);
+            book.setAuthors(new HashSet<>(authors));
+            book.setIsbn(generateValidIsbn13());
+            book.setAvailability(true);
 
-        return bookRepository.save(book);
+            Book saved = bookRepository.save(book);
+            log.info("Book added successfully: id={}", saved.getId());
+            return saved;
+        } catch (RuntimeException ex) {
+            log.error("Failed to add book: {}", ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Unexpected error in addBook", ex);
+            throw new RuntimeException("Failed to add book", ex);
+        }
     }
 
     public Book getBookById(UUID id) {
+        log.debug("Fetching book by id={}", id);
         return bookRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+                .orElseThrow(() -> {
+                    log.warn("Book not found with id={}", id);
+                    return new RuntimeException("Book not found with id: " + id);
+                });
     }
 
     public List<Book> searchBooks(String title, String category, String authorName) {
+        log.debug("Searching books with title={}, category={}, authorName={}", title, category, authorName);
         List<Book> books = bookRepository.findAll();
         if (title != null) {
             books = books.stream()
@@ -75,31 +93,53 @@ public class BookService {
                             .anyMatch(author -> author.getName().equalsIgnoreCase(authorName)))
                     .collect(Collectors.toList());
         }
+        log.info("Book search found {} books", books.size());
         return books;
     }
 
     public Book updateBook(UUID id, UpdateBookRequest request) {
-        Book book = getBookById(id);
-        if (request.getTitle() != null) {
-            book.setTitle(request.getTitle());
+        log.debug("Updating book id={}, request={}", id, request);
+        try {
+            Book book = getBookById(id);
+            if (request.getTitle() != null) {
+                book.setTitle(request.getTitle());
+            }
+            if (request.getCategory() != null) {
+                book.setCategory(request.getCategory());
+            }
+            if (request.getAuthorNames() != null && !request.getAuthorNames().isEmpty()) {
+                List<Author> authors = request.getAuthorNames().stream()
+                        .map(name -> authorRepository.findByName(name)
+                                .orElseThrow(() -> new RuntimeException("Author not found: " + name)))
+                        .collect(Collectors.toList());
+                book.setAuthors(new HashSet<>(authors));
+            }
+            if (request.getAvailability() != null) {
+                book.setAvailability(request.getAvailability());
+            }
+            Book updated = bookRepository.save(book);
+            log.info("Book updated: id={}", updated.getId());
+            return updated;
+        } catch (RuntimeException ex) {
+            log.warn("Failed to update book with id={}: {}", id, ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Unexpected error while updating book with id={}", id, ex);
+            throw new RuntimeException("Failed to update book", ex);
         }
-        if (request.getCategory() != null) {
-            book.setCategory(request.getCategory());
-        }
-        if (request.getAuthorNames() != null && !request.getAuthorNames().isEmpty()) {
-            List<Author> authors = request.getAuthorNames().stream()
-                    .map(name -> authorRepository.findByName(name)
-                            .orElseThrow(() -> new RuntimeException("Author not found: " + name)))
-                    .collect(Collectors.toList());
-            book.setAuthors(new HashSet<>(authors));
-        }
-        if (request.getAvailability() != null) {
-            book.setAvailability(request.getAvailability());
-        }
-        return bookRepository.save(book);
     }
 
     public void deleteBook(UUID id) {
-        bookRepository.deleteById(id);
+        log.debug("Deleting book with id={}", id);
+        try {
+            bookRepository.deleteById(id);
+            log.info("Book deleted: id={}", id);
+        } catch (RuntimeException ex) {
+            log.warn("Failed to delete book with id={}: {}", id, ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Unexpected error while deleting book with id={}", id, ex);
+            throw new RuntimeException("Failed to delete book", ex);
+        }
     }
 }
