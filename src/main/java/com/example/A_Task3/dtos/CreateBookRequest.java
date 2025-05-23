@@ -16,10 +16,8 @@ import java.util.List;
 @Builder
 @Data
 public class CreateBookRequest {
-@NotNull(message = "you need to enter a title")
-private String title;
-    @NotNull(message = "you need to enter a category")
+    @NotNull(message = "You need a isbn")
+    private String isbn;
+    @NotNull(message = "you need a category")
     private Category category;
-    @NotNull(message = "you need to enter atleast an author")
-    private List<String> authorNames;
 }

@@ -6,6 +6,9 @@ import com.example.A_Task3.models.Author;
 import com.example.A_Task3.models.Book;
 import com.example.A_Task3.repositories.IAuthorRepository;
 import com.example.A_Task3.repositories.IBookRepository;
+import com.example.A_Task3.util.openlibrary.OpenLibraryBook;
+import com.example.A_Task3.util.openlibrary.OpenLibraryClient;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,34 +27,43 @@ public class BookService {
     private IAuthorRepository authorRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private OpenLibraryClient openLibraryClient;
 
-    private String generateValidIsbn13() {
-        String prefix = "978";
-        String body = String.format("%09d", new Random().nextInt(1_000_000_000));
-        String raw = prefix + body;
-
-        int sum = 0;
-        for (int i = 0; i < raw.length(); i++) {
-            int digit = Character.getNumericValue(raw.charAt(i));
-            sum += (i % 2 == 0) ? digit : digit * 3;
-        }
-
-        int checkDigit = (10 - (sum % 10)) % 10;
-        return new String(raw + checkDigit);
-    }
 
     public Book addBook(CreateBookRequest request) {
         log.debug("Adding book with request: {}", request);
         try {
-            List<Author> authors = request.getAuthorNames().stream()
-                    .map(name -> authorRepository.findByName(name)
-                            .orElseThrow(() -> new RuntimeException("Author not found: " + name)))
-                    .collect(Collectors.toList());
+            // Fetch book data from Open Library using the ISBN from the request
+            OpenLibraryBook olBook = openLibraryClient.fetchBookByIsbn(request.getIsbn());
 
-            Book book = modelMapper.map(request, Book.class);
-            book.setAuthors(new HashSet<>(authors));
-            book.setIsbn(generateValidIsbn13());
-            book.setAvailability(true);
+            // Throw if no title or authors found
+            if (olBook.getTitle() == null || olBook.getTitle().isEmpty()) {
+                throw new RuntimeException("Book title not found for ISBN: " + request.getIsbn());
+            }
+            if (olBook.getAuthors() == null || olBook.getAuthors().isEmpty()) {
+                throw new RuntimeException("Authors not found for ISBN: " + request.getIsbn());
+            }
+
+            // Find or create authors based on names from Open Library
+            Set<Author> authors = olBook.getAuthors().stream()
+                    .map(name -> authorRepository.findByName(name)
+                            .orElseGet(() -> authorRepository.save(Author.builder().name(name).build())))
+                    .collect(Collectors.toSet());
+
+            // Prevent duplicate ISBNs
+            if (bookRepository.findAll().stream().anyMatch(b -> b.getIsbn().equals(request.getIsbn()))) {
+                throw new RuntimeException("Book with ISBN already exists");
+            }
+
+            // Build new Book entity
+            Book book = Book.builder()
+                    .isbn(request.getIsbn())
+                    .title(olBook.getTitle())
+                    .category(request.getCategory())
+                    .authors(authors)
+                    .availability(true)
+                    .build();
 
             Book saved = bookRepository.save(book);
             log.info("Book added successfully: id={}", saved.getId());
