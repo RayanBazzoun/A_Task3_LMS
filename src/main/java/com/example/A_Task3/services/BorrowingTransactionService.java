@@ -1,5 +1,7 @@
 package com.example.A_Task3.services;
 
+import com.example.A_Task3.client.EmailClient;
+import com.example.A_Task3.client.EmailRequest;
 import com.example.A_Task3.dtos.BorrowingTransactionRequest;
 import com.example.A_Task3.models.*;
 import com.example.A_Task3.models.enums.BorrowStatus;
@@ -23,14 +25,14 @@ public class BorrowingTransactionService {
     private IBookRepository bookRepository;
     @Autowired
     private IBorrowerRepository borrowerRepository;
-
+    @Autowired
+    private EmailClient emailClient;
     @Value("${borrower.transaction.limit}")
     private int transactionLimit;
 
     public BorrowingTransaction borrowBook(BorrowingTransactionRequest request) {
         log.debug("Borrowing book: {}", request);
 
-        // Count only active borrowings (status = BORROWED)
         int count = transactionRepository.countByBorrowerIdAndStatus(request.getBorrowerId(), BorrowStatus.BORROWED);
         if (count >= transactionLimit) {
             log.warn("Borrower {} has reached the maximum allowed transactions ({}).", request.getBorrowerId(), transactionLimit);
@@ -61,6 +63,8 @@ public class BorrowingTransactionService {
                     .build();
             BorrowingTransaction saved = transactionRepository.save(transaction);
             log.info("Book borrowed successfully: transactionId={}", saved.getId());
+            String message = "Book " + book.getTitle() + " borrowed successfully";
+            emailClient.sendEmail(new EmailRequest(borrower.getEmail(), message));
             return saved;
         } catch (RuntimeException ex) {
             log.warn("Failed to borrow book: {}", ex.getMessage());

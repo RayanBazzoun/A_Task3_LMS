@@ -26,7 +26,8 @@ public class OpenLibraryClient {
             throw new Exception("Book not found in Open Library for ISBN: " + isbn);
         }
 
-        String title = bookNode.has("title") ? bookNode.get("title").asText() : null;
+        String title = bookNode.has("t" +
+                "itle") ? bookNode.get("title").asText() : null;
         if (title == null || title.isEmpty()) {
             throw new Exception("Title not found for ISBN: " + isbn);
         }
