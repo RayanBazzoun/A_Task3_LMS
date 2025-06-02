@@ -18,4 +18,5 @@ public class Borrower {
     private String name;
     private String email;
     private String phoneNumber;
+    private UUID cardId;
 }
