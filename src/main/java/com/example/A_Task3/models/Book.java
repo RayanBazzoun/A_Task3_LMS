@@ -4,6 +4,7 @@ import com.example.A_Task3.models.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +35,7 @@ public class Book {
     )
     private Set<Author> authors = new HashSet<>();
     @Column(columnDefinition = "TEXT")
-    private String properties; // stores JSON string with pricing rules
+    private String properties;
+    private BigDecimal price;
 
 }

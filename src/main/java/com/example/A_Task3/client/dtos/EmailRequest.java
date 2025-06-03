@@ -1,4 +1,4 @@
-package com.example.A_Task3.client;
+package com.example.A_Task3.client.dtos;
 
 public class EmailRequest {
     private String email;

@@ -56,14 +56,16 @@ public class BookService {
                 throw new RuntimeException("Book with ISBN already exists");
             }
 
-            // Build new Book entity
             Book book = Book.builder()
                     .isbn(request.getIsbn())
                     .title(olBook.getTitle())
                     .category(request.getCategory())
                     .authors(authors)
                     .availability(true)
+                    .price(request.getPrice())
+                    .properties(request.getProperties())
                     .build();
+
 
             Book saved = bookRepository.save(book);
             log.info("Book added successfully: id={}", saved.getId());

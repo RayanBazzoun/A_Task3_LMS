@@ -1,5 +1,6 @@
 package com.example.A_Task3.dtos;
 
+import com.example.A_Task3.models.PricingProperties;
 import com.example.A_Task3.models.enums.Category;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import org.hibernate.annotations.NotFound;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @NoArgsConstructor
@@ -20,4 +22,9 @@ public class CreateBookRequest {
     private String isbn;
     @NotNull(message = "you need a category")
     private Category category;
+    @NotNull(message = "you need to enter a price")
+    private BigDecimal price;
+    @NotNull(message = "you need to enter a the the properties")
+    private String properties;
+
 }

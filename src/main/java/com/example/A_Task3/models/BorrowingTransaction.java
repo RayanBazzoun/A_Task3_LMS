@@ -4,6 +4,7 @@ import com.example.A_Task3.models.enums.BorrowStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -29,4 +30,11 @@ public class BorrowingTransaction {
 
     @Enumerated(EnumType.STRING)
     private BorrowStatus status;
+
+    // New fields
+    private String cardNumber;
+
+    private BigDecimal totalPrice;
+    private BigDecimal insuranceFee;
+    private BigDecimal extraDaysCharge;
 }

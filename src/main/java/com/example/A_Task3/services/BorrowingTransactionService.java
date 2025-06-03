@@ -2,8 +2,11 @@ package com.example.A_Task3.services;
 
 import com.example.A_Task3.client.CmsClient;
 import com.example.A_Task3.client.EmailClient;
-import com.example.A_Task3.client.EmailRequest;
-import com.example.A_Task3.client.TransactionRequest;
+import com.example.A_Task3.client.dtos.EmailRequest;
+import com.example.A_Task3.client.dtos.TransactionRequest;
+import com.example.A_Task3.client.dtos.TransactionResponse;
+import com.example.A_Task3.client.enums.CurrencyType;
+import com.example.A_Task3.client.enums.TransactionType;
 import com.example.A_Task3.dtos.BorrowingTransactionRequest;
 import com.example.A_Task3.models.*;
 import com.example.A_Task3.models.enums.BorrowStatus;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Slf4j
@@ -58,19 +62,44 @@ public class BorrowingTransactionService {
             Borrower borrower = borrowerRepository.findById(request.getBorrowerId())
                     .orElseThrow(() -> new RuntimeException("Borrower not found."));
 
-            // Parse pricing properties
             PricingProperties pricing = objectMapper.readValue(book.getProperties(), PricingProperties.class);
 
-            BigDecimal basePrice = BigDecimal.valueOf(10); // Example base price
+            BigDecimal basePrice = book.getPrice();
             BigDecimal insuranceFee = pricing.getInsurance_fees();
-            BigDecimal total = basePrice.add(insuranceFee);
+            BigDecimal extraDayPrice = pricing.getExtra_days_rental_price();
 
-            // Charge the borrower
-            cmsClient.createTransaction(TransactionRequest.builder()
-                    .cardId(borrower.getCardId())
+            LocalDate borrowDate = LocalDate.now();
+            LocalDate returnDate = request.getReturnDate();
+
+            long days = ChronoUnit.DAYS.between(borrowDate, returnDate);
+            long extraDays = Math.max(days - 7, 0);
+            BigDecimal extraDaysCharge = extraDayPrice.multiply(BigDecimal.valueOf(extraDays));
+
+            BigDecimal total = basePrice.add(extraDaysCharge).add(insuranceFee);
+
+            TransactionRequest cmsRequest = TransactionRequest.builder()
+                    .cardNumber(request.getCardNumber())
                     .transactionAmount(total)
-                    .transactionType("DEBIT")
-                    .build());
+                    .currency(request.getCurrency())
+                    .transactionType(TransactionType.DEBIT)
+                    .build();
+
+            log.info("Sending CMS request: {}", cmsRequest);
+            TransactionResponse cmsResponse = cmsClient.createTransaction(cmsRequest);
+
+            if (cmsResponse == null) {
+                log.warn("CMS returned null response.");
+                throw new RuntimeException("CMS service did not respond.");
+            }
+
+            if (!cmsResponse.isSuccess()) {
+                log.warn("CMS payment failed. Details: success={}, msg={}, response={}",
+                        cmsResponse.isSuccess(),
+                        cmsResponse.getMessage(),
+                        cmsResponse);
+                throw new RuntimeException("Payment failed: " + cmsResponse.getMessage());
+            }
+
 
             book.setAvailability(false);
             bookRepository.save(book);
@@ -78,12 +107,19 @@ public class BorrowingTransactionService {
             BorrowingTransaction transaction = BorrowingTransaction.builder()
                     .book(book)
                     .borrower(borrower)
-                    .borrowDate(LocalDate.now())
+                    .borrowDate(borrowDate)
+                    .returnDate(returnDate)
                     .status(BorrowStatus.BORROWED)
+                    .cardNumber(request.getCardNumber())
+                    .totalPrice(total)
+                    .insuranceFee(insuranceFee)
+                    .extraDaysCharge(extraDaysCharge)
                     .build();
 
             BorrowingTransaction saved = transactionRepository.save(transaction);
-            emailClient.sendEmail(new EmailRequest(borrower.getEmail(), "Book " + book.getTitle() + " borrowed successfully"));
+
+            emailClient.sendEmail(new EmailRequest(borrower.getEmail(), "Book " + book.getTitle() + " borrowed successfully."));
+
             return saved;
 
         } catch (Exception ex) {
@@ -110,20 +146,23 @@ public class BorrowingTransactionService {
             bookRepository.save(book);
             BorrowingTransaction saved = transactionRepository.save(transaction);
 
-            // Parse pricing
             PricingProperties pricing = objectMapper.readValue(book.getProperties(), PricingProperties.class);
             LocalDate dueDate = transaction.getBorrowDate().plusWeeks(1);
             boolean returnedOnTime = !transaction.getReturnDate().isAfter(dueDate);
 
             if (returnedOnTime) {
                 BigDecimal refund = pricing.getInsurance_fees();
-                cmsClient.createTransaction(TransactionRequest.builder()
-                        .cardId(transaction.getBorrower().getCardId())
+                TransactionRequest refundRequest = TransactionRequest.builder()
+                        .cardNumber(transaction.getCardNumber())
                         .transactionAmount(refund)
-                        .transactionType("CREDIT")
-                        .build());
+                        .currency(CurrencyType.LBP) // or adapt to request if needed
+                        .transactionType(TransactionType.CREDIT)
+                        .build();
+                TransactionResponse refundResponse = cmsClient.createTransaction(refundRequest);
+                if (refundResponse == null || !refundResponse.isSuccess()) {
+                    log.warn("CMS refund failed: {}", refundResponse != null ? refundResponse.getMessage() : "CMS unavailable");
+                }
             }
-
             return saved;
         } catch (Exception ex) {
             log.error("Failed to return book: {}", ex.getMessage(), ex);

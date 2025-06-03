@@ -1,20 +1,21 @@
-package com.example.A_Task3.client;
+package com.example.A_Task3.client.dtos;
 
+import com.example.A_Task3.client.enums.CurrencyType;
+import com.example.A_Task3.client.enums.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionRequest {
-    private UUID cardId;
+    private String cardNumber;
     private BigDecimal transactionAmount;
-    private String transactionType;
-    private String currency = "USD";
+    private TransactionType transactionType;
+    private CurrencyType currency;
 }

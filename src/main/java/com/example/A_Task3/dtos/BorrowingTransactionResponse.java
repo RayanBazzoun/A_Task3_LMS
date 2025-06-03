@@ -1,22 +1,17 @@
 package com.example.A_Task3.dtos;
 
-import com.example.A_Task3.models.enums.BorrowStatus;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.UUID;
 
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Data
 public class BorrowingTransactionResponse {
-    private UUID id;
-    private UUID bookId;
-    private String bookTitle;
-    private UUID borrowerId;
-    private String borrowerName;
-    private LocalDate borrowDate;
-    private LocalDate returnDate;
-    private BorrowStatus status;
+    private UUID transactionId;
+    private boolean success;
+    private String message;
+    private BigDecimal totalPrice;
 }
