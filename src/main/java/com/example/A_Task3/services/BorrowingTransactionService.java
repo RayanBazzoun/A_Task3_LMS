@@ -114,7 +114,10 @@ public class BorrowingTransactionService {
                     .totalPrice(total)
                     .insuranceFee(insuranceFee)
                     .extraDaysCharge(extraDaysCharge)
+                    .currency(request.getCurrency())
                     .build();
+
+
 
             BorrowingTransaction saved = transactionRepository.save(transaction);
 
@@ -155,7 +158,7 @@ public class BorrowingTransactionService {
                 TransactionRequest refundRequest = TransactionRequest.builder()
                         .cardNumber(transaction.getCardNumber())
                         .transactionAmount(refund)
-                        .currency(CurrencyType.LBP) // or adapt to request if needed
+                        .currency(transaction.getCurrency())
                         .transactionType(TransactionType.CREDIT)
                         .build();
                 TransactionResponse refundResponse = cmsClient.createTransaction(refundRequest);
@@ -163,6 +166,8 @@ public class BorrowingTransactionService {
                     log.warn("CMS refund failed: {}", refundResponse != null ? refundResponse.getMessage() : "CMS unavailable");
                 }
             }
+            Borrower borrower=transaction.getBorrower();
+            emailClient.sendEmail(new EmailRequest(borrower.getEmail(), "Book " + book.getTitle() + " borrowed successfully."));
             return saved;
         } catch (Exception ex) {
             log.error("Failed to return book: {}", ex.getMessage(), ex);

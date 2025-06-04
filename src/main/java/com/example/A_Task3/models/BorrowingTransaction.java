@@ -1,5 +1,6 @@
 package com.example.A_Task3.models;
 
+import com.example.A_Task3.client.enums.CurrencyType;
 import com.example.A_Task3.models.enums.BorrowStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,7 +32,8 @@ public class BorrowingTransaction {
     @Enumerated(EnumType.STRING)
     private BorrowStatus status;
 
-    // New fields
+    @Enumerated(EnumType.STRING)
+    private CurrencyType currency;
     private String cardNumber;
 
     private BigDecimal totalPrice;
