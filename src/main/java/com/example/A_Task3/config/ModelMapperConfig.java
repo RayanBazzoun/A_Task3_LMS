@@ -1,4 +1,4 @@
-package com.example.A_Task3;
+package com.example.A_Task3.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

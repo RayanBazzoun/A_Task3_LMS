@@ -34,10 +34,8 @@ public class BookService {
     public Book addBook(CreateBookRequest request) {
         log.debug("Adding book with request: {}", request);
         try {
-            // Fetch book data from Open Library using the ISBN from the request
             OpenLibraryBook olBook = openLibraryClient.fetchBookByIsbn(request.getIsbn());
 
-            // Throw if no title or authors found
             if (olBook.getTitle() == null || olBook.getTitle().isEmpty()) {
                 throw new RuntimeException("Book title not found for ISBN: " + request.getIsbn());
             }
@@ -45,13 +43,11 @@ public class BookService {
                 throw new RuntimeException("Authors not found for ISBN: " + request.getIsbn());
             }
 
-            // Find or create authors based on names from Open Library
             Set<Author> authors = olBook.getAuthors().stream()
                     .map(name -> authorRepository.findByName(name)
                             .orElseGet(() -> authorRepository.save(Author.builder().name(name).build())))
                     .collect(Collectors.toSet());
 
-            // Prevent duplicate ISBNs
             if (bookRepository.findAll().stream().anyMatch(b -> b.getIsbn().equals(request.getIsbn()))) {
                 throw new RuntimeException("Book with ISBN already exists");
             }

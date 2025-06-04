@@ -9,5 +9,4 @@ public class TransactionResponse {
     private String message;
     private String transactionId;
     private String status;
-    //currency?
 }

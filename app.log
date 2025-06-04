@@ -1,1 +1,103 @@
 2025-06-04 09:31:54 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=12h16m43s842ms386µs100ns).
+2025-06-04 09:59:56 [main] INFO  c.example.A_Task3.ATask3Application - Starting ATask3Application using Java 22 with PID 14272 (C:\Users\User\Desktop\Areeba_Tasks\A_Task3\target\classes started by User in C:\Users\User\Desktop\Areeba_Tasks\A_Task3)
+2025-06-04 09:59:56 [main] INFO  c.example.A_Task3.ATask3Application - No active profile set, falling back to 1 default profile: "default"
+2025-06-04 09:59:59 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-04 10:00:01 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-04 10:00:04 [main] INFO  c.example.A_Task3.ATask3Application - Started ATask3Application in 9.26 seconds (process running for 10.468)
+2025-06-04 10:03:24 [http-nio-8080-exec-5] INFO  c.e.A.c.BorrowingTransactionController - Request to return book for transactionId=df279a1d-4ff5-4f3d-9ecb-13704c0b48bf
+2025-06-04 10:03:24 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - select bt1_0.id,b1_0.id,b1_0.availability,b1_0.category,b1_0.isbn,b1_0.price,b1_0.properties,b1_0.title,bt1_0.borrow_date,b2_0.id,b2_0.email,b2_0.name,b2_0.phone_number,bt1_0.card_number,bt1_0.currency,bt1_0.extra_days_charge,bt1_0.insurance_fee,bt1_0.return_date,bt1_0.status,bt1_0.total_price from borrowing_transaction bt1_0 left join book b1_0 on b1_0.id=bt1_0.book_id left join borrower b2_0 on b2_0.id=bt1_0.borrower_id where bt1_0.id=?
+2025-06-04 10:03:24 [http-nio-8080-exec-5] ERROR c.e.A.s.BorrowingTransactionService - Failed to return book: Book has already been returned.
+java.lang.RuntimeException: Book has already been returned.
+	at com.example.A_Task3.services.BorrowingTransactionService.returnBook(BorrowingTransactionService.java:141)
+	at com.example.A_Task3.controllers.BorrowingTransactionController.returnBook(BorrowingTransactionController.java:40)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:258)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:191)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1740)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1570)
+2025-06-04 10:03:24 [http-nio-8080-exec-5] WARN  c.e.A.c.BorrowingTransactionController - Failed to return book for transactionId=df279a1d-4ff5-4f3d-9ecb-13704c0b48bf: Failed to return book
+2025-06-04 10:06:38 [http-nio-8080-exec-8] INFO  c.e.A.controllers.BorrowerController - Request to add borrower: BorrowerRequest(name=Rayan Bilal Bazzoun, email=rayansocial2004@gmail.com, phoneNumber=71412482)
+2025-06-04 10:06:38 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - insert into borrower (email,name,phone_number,id) values (?,?,?,?)
+2025-06-04 10:06:38 [http-nio-8080-exec-8] INFO  c.e.A_Task3.services.BorrowerService - Borrower added: id=cdb6b948-69e1-4d7d-8e3d-84f6293b20b5
+2025-06-04 10:06:38 [http-nio-8080-exec-8] INFO  c.e.A.controllers.BorrowerController - Borrower added successfully: id=cdb6b948-69e1-4d7d-8e3d-84f6293b20b5
+2025-06-04 10:08:04 [http-nio-8080-exec-6] INFO  c.e.A.controllers.BookController - Request to create book: CreateBookRequest(isbn=9780735211292, category=NON_FICTION, price=180000, properties={"insurance_fees": 20000, "extra_days_rental_price": 15000})
+2025-06-04 10:08:10 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - select a1_0.id,a1_0.biography,a1_0.name from author a1_0 where a1_0.name=?
+2025-06-04 10:08:10 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - insert into author (biography,name,id) values (?,?,?)
+2025-06-04 10:08:10 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - select b1_0.id,b1_0.availability,b1_0.category,b1_0.isbn,b1_0.price,b1_0.properties,b1_0.title from book b1_0
+2025-06-04 10:08:10 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - insert into book (availability,category,isbn,price,properties,title,id) values (?,?,?,?,?,?,?)
+2025-06-04 10:08:10 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - insert into book_author (book_id,author_id) values (?,?)
+2025-06-04 10:08:10 [http-nio-8080-exec-6] INFO  c.e.A_Task3.services.BookService - Book added successfully: id=84e61139-dee4-46ee-a2d5-f026db51256d
+2025-06-04 10:08:10 [http-nio-8080-exec-6] INFO  c.e.A.controllers.BookController - Book created successfully: id=84e61139-dee4-46ee-a2d5-f026db51256d
+2025-06-04 10:09:16 [http-nio-8080-exec-1] INFO  c.e.A.c.BorrowingTransactionController - Request to borrow book: BorrowingTransactionRequest(bookId=84e61139-dee4-46ee-a2d5-f026db51256d, borrowerId=cdb6b948-69e1-4d7d-8e3d-84f6293b20b5, cardNumber=3251304776190762, returnDate=2025-06-09, currency=LBP)
+2025-06-04 10:09:16 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - select count(bt1_0.id) from borrowing_transaction bt1_0 left join borrower b1_0 on b1_0.id=bt1_0.borrower_id where b1_0.id=? and bt1_0.status=?
+2025-06-04 10:09:16 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - select b1_0.id,b1_0.availability,b1_0.category,b1_0.isbn,b1_0.price,b1_0.properties,b1_0.title from book b1_0 where b1_0.id=?
+2025-06-04 10:09:16 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - select b1_0.id,b1_0.email,b1_0.name,b1_0.phone_number from borrower b1_0 where b1_0.id=?
+2025-06-04 10:09:16 [http-nio-8080-exec-1] INFO  c.e.A.s.BorrowingTransactionService - Sending CMS request: TransactionRequest(cardNumber=3251304776190762, transactionAmount=200000, transactionType=DEBIT, currency=LBP)
+2025-06-04 10:09:16 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - update book set availability=?,category=?,isbn=?,price=?,properties=?,title=? where id=?
+2025-06-04 10:09:16 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - insert into borrowing_transaction (book_id,borrow_date,borrower_id,card_number,currency,extra_days_charge,insurance_fee,return_date,status,total_price,id) values (?,?,?,?,?,?,?,?,?,?,?)
+2025-06-04 10:09:20 [http-nio-8080-exec-1] INFO  c.e.A.c.BorrowingTransactionController - Book borrowed successfully: transactionId=f268393a-7afa-492a-bfb3-a1d0f951ab8c
+2025-06-04 10:09:20 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - select a1_0.book_id,a1_1.id,a1_1.biography,a1_1.name from book_author a1_0 join author a1_1 on a1_1.id=a1_0.author_id where a1_0.book_id=?
+2025-06-04 10:09:45 [http-nio-8080-exec-2] INFO  c.e.A.c.BorrowingTransactionController - Request to return book for transactionId=f268393a-7afa-492a-bfb3-a1d0f951ab8c
+2025-06-04 10:09:45 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - select bt1_0.id,b1_0.id,b1_0.availability,b1_0.category,b1_0.isbn,b1_0.price,b1_0.properties,b1_0.title,bt1_0.borrow_date,b2_0.id,b2_0.email,b2_0.name,b2_0.phone_number,bt1_0.card_number,bt1_0.currency,bt1_0.extra_days_charge,bt1_0.insurance_fee,bt1_0.return_date,bt1_0.status,bt1_0.total_price from borrowing_transaction bt1_0 left join book b1_0 on b1_0.id=bt1_0.book_id left join borrower b2_0 on b2_0.id=bt1_0.borrower_id where bt1_0.id=?
+2025-06-04 10:09:45 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - update book set availability=?,category=?,isbn=?,price=?,properties=?,title=? where id=?
+2025-06-04 10:09:45 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - update borrowing_transaction set book_id=?,borrow_date=?,borrower_id=?,card_number=?,currency=?,extra_days_charge=?,insurance_fee=?,return_date=?,status=?,total_price=? where id=?
+2025-06-04 10:09:46 [http-nio-8080-exec-2] INFO  c.e.A.c.BorrowingTransactionController - Book returned successfully: transactionId=f268393a-7afa-492a-bfb3-a1d0f951ab8c
+2025-06-04 10:09:46 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - select a1_0.book_id,a1_1.id,a1_1.biography,a1_1.name from book_author a1_0 join author a1_1 on a1_1.id=a1_0.author_id where a1_0.book_id=?
+2025-06-04 10:24:50 [http-nio-8080-exec-3] INFO  c.e.A.c.BorrowingTransactionController - Request to borrow book: BorrowingTransactionRequest(bookId=84e61139-dee4-46ee-a2d5-f026db51256d, borrowerId=cdb6b948-69e1-4d7d-8e3d-84f6293b20b5, cardNumber=3251304776190762, returnDate=2025-06-09, currency=LBP)
+2025-06-04 10:24:50 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - select count(bt1_0.id) from borrowing_transaction bt1_0 left join borrower b1_0 on b1_0.id=bt1_0.borrower_id where b1_0.id=? and bt1_0.status=?
+2025-06-04 10:24:50 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - select b1_0.id,b1_0.availability,b1_0.category,b1_0.isbn,b1_0.price,b1_0.properties,b1_0.title from book b1_0 where b1_0.id=?
+2025-06-04 10:24:50 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - select b1_0.id,b1_0.email,b1_0.name,b1_0.phone_number from borrower b1_0 where b1_0.id=?
+2025-06-04 10:24:50 [http-nio-8080-exec-3] INFO  c.e.A.s.BorrowingTransactionService - Sending CMS request: TransactionRequest(cardNumber=3251304776190762, transactionAmount=200000, transactionType=DEBIT, currency=LBP)
+2025-06-04 10:24:50 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - update book set availability=?,category=?,isbn=?,price=?,properties=?,title=? where id=?
+2025-06-04 10:24:50 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - insert into borrowing_transaction (book_id,borrow_date,borrower_id,card_number,currency,extra_days_charge,insurance_fee,return_date,status,total_price,id) values (?,?,?,?,?,?,?,?,?,?,?)
+2025-06-04 10:24:54 [http-nio-8080-exec-3] INFO  c.e.A.c.BorrowingTransactionController - Book borrowed successfully: transactionId=3033ef87-d0fe-41ae-b90a-64e709526063
+2025-06-04 10:24:54 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - select a1_0.book_id,a1_1.id,a1_1.biography,a1_1.name from book_author a1_0 join author a1_1 on a1_1.id=a1_0.author_id where a1_0.book_id=?
+2025-06-04 10:26:45 [http-nio-8080-exec-7] INFO  c.e.A.c.BorrowingTransactionController - Request to return book for transactionId=3033ef87-d0fe-41ae-b90a-64e709526063
+2025-06-04 10:26:45 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - select bt1_0.id,b1_0.id,b1_0.availability,b1_0.category,b1_0.isbn,b1_0.price,b1_0.properties,b1_0.title,bt1_0.borrow_date,b2_0.id,b2_0.email,b2_0.name,b2_0.phone_number,bt1_0.card_number,bt1_0.currency,bt1_0.extra_days_charge,bt1_0.insurance_fee,bt1_0.return_date,bt1_0.status,bt1_0.total_price from borrowing_transaction bt1_0 left join book b1_0 on b1_0.id=bt1_0.book_id left join borrower b2_0 on b2_0.id=bt1_0.borrower_id where bt1_0.id=?
+2025-06-04 10:26:45 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - update book set availability=?,category=?,isbn=?,price=?,properties=?,title=? where id=?
+2025-06-04 10:26:45 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - update borrowing_transaction set book_id=?,borrow_date=?,borrower_id=?,card_number=?,currency=?,extra_days_charge=?,insurance_fee=?,return_date=?,status=?,total_price=? where id=?
+2025-06-04 10:26:45 [http-nio-8080-exec-7] INFO  c.e.A.c.BorrowingTransactionController - Book returned successfully: transactionId=3033ef87-d0fe-41ae-b90a-64e709526063
+2025-06-04 10:26:45 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - select a1_0.book_id,a1_1.id,a1_1.biography,a1_1.name from book_author a1_0 join author a1_1 on a1_1.id=a1_0.author_id where a1_0.book_id=?
